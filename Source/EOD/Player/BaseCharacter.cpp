@@ -48,12 +48,12 @@ void ABaseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 
 bool ABaseCharacter::IsAlive() const
 {
-	return StatsComp->CurrentHealth > 0;
+	return StatsComp->GetCurrentHealth() > 0;
 }
 
 bool ABaseCharacter::IsDead() const
 {
-	return StatsComp->CurrentHealth <= 0;
+	return StatsComp->GetCurrentHealth() <= 0;
 }
 
 bool ABaseCharacter::IsIdle() const
@@ -93,7 +93,7 @@ bool ABaseCharacter::IsDodging() const
 
 bool ABaseCharacter::NeedsHeal() const
 {
-	return StatsComp->CurrentHealth / StatsComp->MaxHealth <= 0.25;
+	return StatsComp->IsLowOnHealth();
 }
 
 void ABaseCharacter::SetCharacterState(ECharacterState NewState)
@@ -302,6 +302,16 @@ bool ABaseCharacter::CanNormalAttack() const
 bool ABaseCharacter::CanDodge() const
 {
 	return CharacterState == ECharacterState::IdleWalkRun;
+}
+
+void ABaseCharacter::AddStatusEffectVisuals(FStatusEffectInfo StatusEffectInfo)
+{
+	// @todo definition
+}
+
+void ABaseCharacter::RemoveStatusEffectVisuals(FStatusEffectInfo StatusEffectInfo)
+{
+	// @todo definition
 }
 
 // Called when the game starts or when spawned

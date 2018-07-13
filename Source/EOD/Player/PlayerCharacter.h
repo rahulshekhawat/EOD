@@ -28,6 +28,9 @@ public:
 	
 	// Property replication
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	
+	/** Spawn default weapon */
+	virtual void PostInitializeComponents() override;
 
 #if WITH_EDITOR
 	/**
@@ -66,6 +69,24 @@ public:
 	float GetRotationYawFromAxisInput();
 	//~ End Functions to Assist Input Handling
 	
+	UPROPERTY(Transient)
+	class APrimaryWeapon* PrimaryWeapon;
+	
+	UPROPERTY(Transient)
+	class ASecondaryWeapon* SecondaryWeapon;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Weapons)
+	FName PrimaryWeaponID;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Weapons)
+	FName SecondaryWeaponID;
+
+	void SetCurrentWeapon(FName WeaponID);
+
+	void SetCurrentWeapon(FWeaponData* WeaponData);
+
+	void UpdateCurrentWeaponAnimationType(EWeaponType NewWeaponType);
+
 private:
 
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
@@ -76,38 +97,38 @@ private:
 
 
 	//~ Begin Weapon Components Declaration
-	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	UStaticMeshComponent* PrimaryWeapon;
+	// UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	// UStaticMeshComponent* PrimaryWeapon;
 
-	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	UStaticMeshComponent* SecondaryWeapon;
+	// UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	// UStaticMeshComponent* SecondaryWeapon;
 
-	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	UStaticMeshComponent* SheathedPrimaryWeapon;
+	// UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	// UStaticMeshComponent* SheathedPrimaryWeapon;
 
-	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	UStaticMeshComponent* SheathedSecondaryWeapon;
+	// UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	// UStaticMeshComponent* SheathedSecondaryWeapon;
 
-	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	UStaticMeshComponent* DroppedPrimaryWeapon;
+	// UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	// UStaticMeshComponent* DroppedPrimaryWeapon;
 
-	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	UStaticMeshComponent* DroppedSecondaryWeapon;
+	// UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	// UStaticMeshComponent* DroppedSecondaryWeapon;
 	//~ End Weapon Components Declaration
 
 
 	//~ Begin Armor Components Declaration
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	USkeletalMeshComponent* Hair;
-
+	
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	USkeletalMeshComponent* HatItem;
 
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	USkeletalMeshComponent* FaceItem;
-
+	USkeletalMeshComponent* Face;
+	
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	USkeletalMeshComponent* Chest;
+	USkeletalMeshComponent* FaceItem;
 
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	USkeletalMeshComponent* Hands;
