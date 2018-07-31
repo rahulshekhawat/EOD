@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Player/BaseCharacter.h"
+#include "Player/EODCharacterBase.h"
 #include "MobCharacter.generated.h"
 
 /**
- * 
+ * Base class for in-game AI controlled mob character
  */
 UCLASS()
-class EOD_API AMobCharacter : public ABaseCharacter
+class EOD_API AMobCharacter : public AEODCharacterBase
 {
 	GENERATED_BODY()
 	
@@ -19,7 +19,8 @@ public:
 	AMobCharacter(const FObjectInitializer& ObjectInitializer);
 	
 protected:
-	// Called when the game starts or when spawned
+
+	/** Called when the game starts or when spawned */
 	virtual void BeginPlay() override;
 
 public:

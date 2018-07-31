@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Player/Components/BaseStatsComponent.h"
+#include "Player/Components/StatsComponentBase.h"
 #include "PlayerStatsComponent.generated.h"
 
 /**
- * 
+ * PlayerStatsComponent is used to manage stats of a player controlled character
  */
 UCLASS()
-class EOD_API UPlayerStatsComponent : public UBaseStatsComponent
+class EOD_API UPlayerStatsComponent : public UStatsComponentBase
 {
 	GENERATED_BODY()
 	
@@ -18,7 +18,7 @@ public:
 
 	UPlayerStatsComponent(const FObjectInitializer& ObjectInitializer);
 
-	// Property replication
+	/** Sets up property replication */
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	
 	virtual int32 GetBaseHealth() const override;
@@ -110,8 +110,20 @@ public:
 	virtual int32 GetBleedResistance() const override;
 
 	virtual int32 GetCrowdControlResistance() const override;
+	
+	virtual void AddCrowdControlImmunity(ECrowdControlEffect CrowdControlEffect) override;
+	
+	virtual void AddCrowdControlImmunities(uint8 CrowdControlImmunities) override;
+	
+	virtual void RemoveCrowdControlImmunity(ECrowdControlEffect CrowdControlEffect) override;
+	
+	virtual void RemoveCrowdControlImmunities(uint8 CrowdControlImmunities) override;
 
-	// @todo crowd control immunities
+	virtual void RemoveAllCrowdControlImmunities() override;
+
+	virtual bool HasCrowdControlImmunity(ECrowdControlEffect CrowdControlEffect) const override;
+
+	virtual uint8 GetCrowdControlImmunities() const override;
 
 	virtual float GetCooldownModifier() const override;
 
@@ -119,11 +131,9 @@ public:
 
 	virtual float GetDropRateModifier() const override;
 
-	virtual float GetStaminaConsumptionModifer() const override;
+	virtual float GetStaminaConsumptionModifier() const override;
 
 	virtual float GetMovementSpeedModifier() const override;
-
-	// virtual float GetAnimationSpeedModifier() const override;
 	
 	virtual float GetActiveTimeDilation() const override;
 
@@ -135,35 +145,22 @@ public:
 
 private:
 	
-	// @note All changes to variables similar to MaxHealth, CurrentHealth, etc. will occur ONLY on server and will automatically get replicated. No RPC needed.
+	//~ @note All changes to variables similar to MaxHealth, CurrentHealth, etc. will occur ONLY on server and will automatically get replicated. No RPC needed.
 
-	/**
-	 * Current player level
-	 * @note Player level will change rarely and therefore does not need to be set to replicate
-	 * @todo Multicast for replicating level changes
-	*/
+	//~ @todo Multicast for replicating level changes
+	//~ @todo Client RPCs to replicate the changes in BaseHealth, BaseMana, and BaseStamina to owning character
+
 	UPROPERTY(EditDefaultsOnly, Category = BaseStats)
 	int32 Level;
 
-	/**
-	 * Maximum health of character without any status effects
-	 * Rarely changes; not replicated
-	 * @todo An RPC (most probably a client RPC) to replicate changes in BaseHealth to owning client
-	*/
+	/** Maximum health of character without any status effects */
 	UPROPERTY(EditDefaultsOnly, Category = BaseStats)
 	int32 BaseHealth;
 
-	/**
-	 * Current maximum health of character - with or without any status effects
-	 * Changes often to status effects; replicated
-	*/
+	/** Current maximum health of character - with or without any status effects */
 	UPROPERTY(Replicated)
 	int32 MaxHealth;
 
-	/**
-	 * Current health of character
-	 * Changes often; replicated
-	*/
 	/** Current health of character */
 	UPROPERTY(Replicated)
 	int32 CurrentHealth;
@@ -171,31 +168,29 @@ private:
 	/** Maximum mana of character without any status effects */
 	UPROPERTY(EditDefaultsOnly, Category = BaseStats)
 	int32 BaseMana;
-
+	
+	/** Current maximum health of character - with or without any status effects */
 	UPROPERTY(Replicated)
 	int32 MaxMana;
-
+	
+	/** Current mana of character */
 	UPROPERTY(Replicated)
 	int32 CurrentMana;
 	
+	/** Maximum stamina of character without any status effects */
 	UPROPERTY(EditDefaultsOnly, Category = BaseStats)
 	int32 BaseStamina;
-
+	
+	/** Current maximum stamina of character - with or without any status effects */
 	UPROPERTY(Replicated)
 	int32 MaxStamina;
-
+	
+	/** Current stamina of character */
 	UPROPERTY(Replicated)
 	int32 CurrentStamina;
 
-	/**
-	 * @note
-	 * Regeneration rate could change a lot due to status effects or change in combat status
-	 * But it is not necessary to replicate this variable to all clients except the owning client
-	 * The health regeneration will automatically get replicated through CurrentHealth
-	*/
-
-	//~ @todo If regeneration rates does not need to be displayed in character UI
-	// then they can simply be set to not replicate
+	//~ If regeneration rates are not displayed to player in-game then they are not needed to be replicated
+	//~ However, if we do need to replicate regeneration rate then we can simply replicate it to owner only
 
 	UPROPERTY(Replicated, EditDefaultsOnly, Category = BaseStats, AdvancedDisplay)
 	int32 HealthRegenRate;
@@ -231,11 +226,10 @@ private:
 	int32 MagickCritBonus;
 
 	//~ @todo replication conditions for ElementalDamage and ElementalResistance
-	/** 
-	 * @note: variables like ElementalResistance may not need to be replicated.
-	 * The server can simply do calculations with it's own copy of ElementalResistance
-	 * and pass on the result to clients.
-	 */
+
+	//~ @note Properties like ElementalResistance may not need to be replicated.
+	//~ The server can simply do the calculations with it's own copy of ElementalResistance
+	//~ and pass on the result to the clients
 
 	UPROPERTY(Replicated, EditDefaultsOnly, Category = OffensiveStats, AdvancedDisplay)
 	int32 ElementalFireDamage;
@@ -279,11 +273,11 @@ private:
 	UPROPERTY(Replicated, EditDefaultsOnly, Category = DefensiveStats, AdvancedDisplay)
 	int32 CrowdControlResistance;
 	
-	/**
-	 * @note
-	 * CooldownModifier, ExpModifier, DropRateModifier, and StaminaConsumptionModifier
-	 * will be replicated to owner only. They are irrelevant to other clients.
-	*/
+	UPROPERTY(Replicated, EditDefaultsOnly, Category = DefensiveStats, meta = (Bitmask, BitmaskEnum = "ECrowdControlEffect"))
+	uint8 CrowdControlImmunities;
+
+	//~ @note CooldownModifier, ExpModifier, DropRateModifier, and StaminaConsumptionModifier
+	//~ will be replicated to owner only. They are irrelevant to other clients.
 
 	UPROPERTY(Replicated, EditDefaultsOnly, Category = AdditionalStats, AdvancedDisplay)
 	float CooldownModifier;
@@ -297,18 +291,11 @@ private:
 	UPROPERTY(Replicated, EditDefaultsOnly, Category = AdditionalStats, AdvancedDisplay)
 	float StaminaConsumptionModifier;
 
-	/**
-	 * @note
-	 * MovementSpeedModifier, AnimationSpeedModifier, SpellCastingSpeedModifier, and
-	 * Darkness will be replicated to all clients
-	*/
+	//~ @note MovementSpeedModifier, AnimationSpeedModifier, SpellCastingSpeedModifier,
+	//~ and Darkness will be replicated to all clients
 
 	UPROPERTY(Replicated, EditDefaultsOnly, Category = AdditionalStats, AdvancedDisplay)
 	float MovementSpeedModifier;
-	
-	//~ AnimationSpeedModifier has been replaced with ActiveTimeDilation
-	// UPROPERTY(Replicated, EditDefaultsOnly, Category = AdditionalStats, AdvancedDisplay)
-	// float AnimationSpeedModifier;
 	
 	UPROPERTY(Replicated, EditDefaultsOnly, Category = AdditionalStats, AdvancedDisplay)
 	float ActiveTimeDilation;

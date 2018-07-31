@@ -1,21 +1,21 @@
 // Copyright 2018 Moikkai Games. All Rights Reserved.
 
 #include "IceElemental.h"
-#include "Player/BaseCharacter.h"
-#include "Player/Components/BaseStatsComponent.h"
+#include "Player/EODCharacterBase.h"
 
 #include "Engine/World.h"
 #include "TimerManager.h"
 
-TArray<ABaseCharacter*> UIceElemental::SlowedDownCharacters = TArray<ABaseCharacter*>();
+TArray<AEODCharacterBase*> UIceElemental::SlowedDownCharacters = TArray<AEODCharacterBase*>();
 
+/*
 UIceElemental::UIceElemental()
 {
 	bTriggersOnSuccessfulHit = true;
 	SlowDownDuration = 2.f;
 }
 
-void UIceElemental::OnInitialize(ABaseCharacter * Owner, class AActor* Initiator)
+void UIceElemental::OnInitialize(ABaseCharacter * Owner, class AActor* Instigator)
 {
 	// Owner is needed to activate buffs on self or allies
 	SetOwningCharacter(Owner);
@@ -85,7 +85,6 @@ void UIceElemental::RemoveSlowDown(ABaseCharacter * TargetCharacter)
 	SlowedDownCharacters.Remove(TargetCharacter);
 }
 
-/*
 void UIceElemental::ApplySlowDown(TWeakObjectPtr<ABaseCharacter> TargetCharacter)
 {
 	FTimerHandle TimerHandle;
